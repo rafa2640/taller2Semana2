@@ -7,6 +7,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String operaciones = "";
+  String resultadoOperaciones = "";
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
         Expanded(
           child: Container(
             color: Colors.red,
+            child: Text(resultadoOperaciones),
           ),
         ),
         Container(
@@ -131,8 +133,17 @@ class _HomePageState extends State<HomePage> {
                         });
                       },
                       child: Text("C")),
-                  ElevatedButton(onPressed: () {
-                    print(operaciones);
+                  ElevatedButton(
+                    onPressed: () {
+                      print(operaciones);
+
+                      var arreglo = operaciones.split(" ");
+                      if(arreglo[1].trim() == "-"){
+                        var resultado = int.parse(arreglo[0] - int.parse(arreglo[2]);
+                        
+                        resultadoOperaciones = '$resultado';
+                      }
+                      print(arreglo);
                   }, child: Text("=")),
                   ElevatedButton(
                       onPressed: () {
