@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class HomePage extends StatefulWidget {
   @override
@@ -8,6 +9,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String operaciones = "";
   List<Text> resultados = [];
+  String mensaje = "";
+  bool error = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +45,13 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(operaciones),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(operaciones),
+                  Text(mensaje),
+                ],
+              ),
             ],
           ),
         ),
@@ -77,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _signos(" / ");
+                          operaciones += " / ";
                         });
                       },
                       child: Text("/")),
@@ -110,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _signos(" x ");
+                          operaciones += " x ";
                         });
                       },
                       child: Text("x")),
@@ -143,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _signos(" - ");
+                          operaciones += " - ";
                         });
                       },
                       child: Text("-")),
@@ -163,23 +172,30 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         setState(() {
                           operaciones = "";
+                          error = false;
+                          mensaje = "";
                         });
                       },
                       child: Text("C")),
                   ElevatedButton(
                       onPressed: () {
-                        setState(() {
-                          _signos("");
+                        setState(() {                          
                           double result = _calcular(operaciones);
-                          resultados.add(Text("$operaciones = $result"));
-                          operaciones = "$result";
+                          if(error){                            
+                            mensaje= "Operación no valida";
+                            
+                          }else{
+                            resultados.add(Text("$operaciones = $result"));
+                            operaciones = "$result";
+                          }
+                          
                         });
                       },
                       child: Text("=")),
                   ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _signos(" + ");
+                          operaciones += " + ";
                         });
                       },
                       child: Text("+")),
@@ -193,50 +209,43 @@ class _HomePageState extends State<HomePage> {
   }
 
   double _calcular(String operacion) {
-    print(operacion);
-    double result = 0;
-    if (operacion.indexOf(" + ") != -1) {
-      List<String> terminos = operacion.split(" + ");
-      for (String valor in terminos) {
-        result += _calcular(valor);
-      }
-    } else if (operacion.indexOf(" - ") != -1) {
-      List<String> terminos = operacion.split(" - ");
-      result += _calcular(terminos.elementAt(0));
-      for (var i = 1; i < terminos.length; i++) {
-        result -= _calcular(terminos.elementAt(i));
-      }
-    } else if (operacion.indexOf(" / ") != -1) {
-      List<String> terminos = operacion.split(" / ");
-      result += _calcular(terminos.elementAt(0));
-      for (var i = 1; i < terminos.length; i++) {
-        if (terminos.elementAt(i) == "0") {
-          resultados.add(Text("Error: División por cero"));
-        } else {
+    try{
+      double result = 0;
+      if (operacion.indexOf(" + ") != -1) {
+        List<String> terminos = operacion.split(" + ");
+        for (String valor in terminos) {
+          result += _calcular(valor);
+        }
+      } else if (operacion.indexOf(" - ") != -1) {
+        List<String> terminos = operacion.split(" - ");
+        result += _calcular(terminos.elementAt(0));
+        for (var i = 1; i < terminos.length; i++) {
+          result -= _calcular(terminos.elementAt(i));
+        }
+      } else if (operacion.indexOf(" / ") != -1) {
+        List<String> terminos = operacion.split(" / ");
+        result += _calcular(terminos.elementAt(0));
+        for (var i = 1; i < terminos.length; i++) {
           result = result / _calcular(terminos.elementAt(i));
         }
+      } else if (operacion.indexOf(" x ") != -1) {
+        result = 1;
+        List<String> terminos = operacion.split(" x ");
+        for (String valor in terminos) {
+          result *= _calcular(valor);
+        }
+      } else if(operacion == ""){
+        throw Exception("Termino vacio");
+      }else{
+        result = double.parse(operacion);
       }
-    } else if (operacion.indexOf(" x ") != -1) {
-      result = 1;
-      List<String> terminos = operacion.split(" x ");
-      for (String valor in terminos) {
-        result *= _calcular(valor);
-      }
-    } else {
-      result = double.parse(operacion);
+      return result;
+    }catch(e){
+      error = true;
+      return 0;
     }
-    return result;
+    
+    
   }
-
-  void _signos(String signo) {
-    if (operaciones == "") {
-      operaciones = "0";
-    } else if (operaciones.endsWith(" + ") ||
-        operaciones.endsWith(" - ") ||
-        operaciones.endsWith(" x ") ||
-        operaciones.endsWith(" / ")) {
-      operaciones = operaciones.substring(0, operaciones.length - 3);
-    }
-    operaciones += signo;
-  }
+  
 }
