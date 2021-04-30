@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:taller2/page/resultados.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -90,6 +91,13 @@ class _HomePageState extends State<HomePage> {
                         });
                       },
                       child: Text("/")),
+                  ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      operaciones += "√";
+                    });
+                  },
+                  child: Text("√")),
                 ],
               ),
               Row(
@@ -123,6 +131,13 @@ class _HomePageState extends State<HomePage> {
                         });
                       },
                       child: Text("x")),
+                  ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      operaciones += "²";
+                    });
+                  },
+                  child: Text("²")),
                 ],
               ),
               Row(
@@ -156,6 +171,13 @@ class _HomePageState extends State<HomePage> {
                         });
                       },
                       child: Text("-")),
+                      ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      operaciones += "%";
+                    });
+                  },
+                  child: Text("%")),
                 ],
               ),
               Row(
@@ -199,8 +221,17 @@ class _HomePageState extends State<HomePage> {
                         });
                       },
                       child: Text("+")),
+                  ElevatedButton(
+                  onPressed: () {
+                     Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ResultadosPage(resultados: resultados)));                  
+                  },
+                  child: Text("R")),
                 ],
-              )
+              ),
             ],
           ),
         )
@@ -234,6 +265,17 @@ class _HomePageState extends State<HomePage> {
         for (String valor in terminos) {
           result *= _calcular(valor);
         }
+      } else if (operacion.indexOf("√") != -1) {
+        List<String> terminos = operacion.split("√");
+        result = sqrt(_calcular(terminos.elementAt(1)));
+      } else if (operacion.indexOf("²") != -1) {
+        List<String> terminos = operacion.split("²");
+        result = _calcular(terminos.elementAt(0));
+        result *= result;
+      } else if (operacion.indexOf("%") != -1) {
+        List<String> terminos = operacion.split("%");
+        result = double.parse(terminos.elementAt(0));
+        result /= 100;
       } else if(operacion == ""){
         throw Exception("Termino vacio");
       }else{
